@@ -2,12 +2,20 @@
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
+from time import time
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+if path.exists("VERSION.txt"):
+    # this file can be written by CI tools (e.g. Travis)
+    with open("VERSION.txt") as version_file:
+        version = version_file.read().strip().strip("v")
+else:
+    version = str(time())
 
 setup(
     name='''ckanext-file_uploader_ui''',
@@ -15,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.0.1',
+    version=version,
 
     description='''Enhance file uploader UI for CKAN''',
     long_description=long_description,

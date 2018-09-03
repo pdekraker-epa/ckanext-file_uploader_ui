@@ -4,7 +4,8 @@ $(function () {
     'use strict';
     let firstAdd = false;
     $('#fileupload').fileupload({
-        url: '/file_uploader_ui/upload'
+        url: '/file_uploader_ui/upload',
+        autoUpload: true
     }).bind('fileuploadadd', function(e, data) {
         if (!firstAdd) {
             firstAdd = true;

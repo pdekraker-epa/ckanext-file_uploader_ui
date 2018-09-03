@@ -1,11 +1,12 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-from flask import Blueprint, request, jsonify
-import json
+from flask import Blueprint, request, jsonify, redirect
 
 
 def file_uploader_ui():
     resource_create = toolkit.get_action('resource_create')
+    package_show = toolkit.get_action('package_show')
+    package_update = toolkit.get_action('package_update')
     package_id = request.form['package_id']
     files = request.files.values()
     assert len(files) == 1
@@ -15,6 +16,15 @@ def file_uploader_ui():
                                           'upload': files[0]})
     return jsonify({'files': [{'name': resource['name'],
                                'url': resource['url']}]})
+
+
+def file_uploader_finish(package_id):
+    package_show = toolkit.get_action('package_show')
+    package_update = toolkit.get_action('package_update')
+    package = package_show(data_dict={'name_or_id': package_id})
+    package['state'] = 'active'
+    package_update(data_dict=package)
+    return redirect('/dataset/{}'.format(package_id))
 
 
 class File_Uploader_UiPlugin(plugins.SingletonPlugin):
@@ -33,4 +43,8 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin):
                                u'file_uploader_ui_upload',
                                file_uploader_ui,
                                methods=['POST'])
+        blueprint.add_url_rule(u'/file_uploader_ui/finish/<package_id>',
+                               u'file_uploader_ui_finish',
+                               file_uploader_finish,
+                               methods=['GET'])
         return blueprint
