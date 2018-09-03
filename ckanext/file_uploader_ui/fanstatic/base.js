@@ -1,0 +1,1 @@
+window.blueimp = window.blueimp || {};
