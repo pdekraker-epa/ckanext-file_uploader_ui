@@ -14,7 +14,7 @@ def file_uploader_ui():
     assert len(files) == 1
     file_storage = files[0] # type: FileStorage
     file_uuid = str(uuid.uuid4())
-    file_path = os.path.join(toolkit.config.get('cache_dir'), 'file_uploader_ui',
+    file_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui',
                              package_id, file_uuid)
     os.makedirs(file_path)
     file_storage.save(os.path.join(file_path, 'file'))
@@ -24,7 +24,7 @@ def file_uploader_ui():
                                'url': '/file_uploader_ui/preview/{}/{}'.format(package_id, file_uuid)}]})
 
 def file_uploader_preview(package_id, file_uuid):
-    file_path = os.path.join(toolkit.config.get('cache_dir'), 'file_uploader_ui',
+    file_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui',
                              package_id, file_uuid)
     with open(os.path.join(file_path, 'metadata')) as f:
         file_name = json.load(f)['name']
@@ -38,7 +38,7 @@ def file_uploader_preview(package_id, file_uuid):
 
 def file_uploader_finish(package_id):
     resource_create = toolkit.get_action('resource_create')
-    package_path = os.path.join(toolkit.config.get('cache_dir'), 'file_uploader_ui', package_id)
+    package_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui', package_id)
     for file_uuid in os.listdir(package_path):
         file_path = os.path.join(package_path, file_uuid)
         with open(os.path.join(file_path, 'metadata')) as f:
