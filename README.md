@@ -20,10 +20,8 @@ Minimal supported CKAN version: 2.8.1
 Update the version in `VERSION.txt`, then build and upload:
 
 ```
-rm -rf dist &&\
 python setup.py sdist &&\
-twine upload dist/*
+twine upload dist/ckanext-file_uploader_ui-$(cat VERSION.txt).tar.gz
 ```
 
-ckanext-file_uploader_ui should be availabe on PyPI as
-https://pypi.python.org/pypi/ckanext-file_uploader_ui.
+ckanext-file_uploader_ui should be availabe on PyPI as https://pypi.python.org/pypi/ckanext-file_uploader_ui.
