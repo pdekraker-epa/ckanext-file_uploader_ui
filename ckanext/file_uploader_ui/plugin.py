@@ -26,13 +26,16 @@ def file_uploader_ui():
     file_storage.save(os.path.join(file_path, 'file'))
     with open(os.path.join(file_path, 'metadata'), 'w') as f:
         json.dump({'name': file_storage.filename}, f)
+    file_extension = file_storage.filename.split('.')[-1]
+    url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
+                                                         package_id,
+                                                         file_uuid,
+                                                         file_extension)
     return jsonify({'files': [{'name': file_storage.filename,
-                               'url': '{}/file_uploader_ui/download/{}/{}'.format(toolkit.config.get('ckan.site_url'),
-                                                                                  package_id,
-                                                                                  file_uuid)}]})
+                               'url': url}]})
 
 
-def file_uploader_download(package_id, file_uuid):
+def file_uploader_download(package_id, file_uuid, file_extension):
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
@@ -61,11 +64,14 @@ def file_uploader_finish(package_id):
         file_path = os.path.join(package_path, file_uuid)
         with open(os.path.join(file_path, 'metadata')) as f:
             file_name = json.load(f)['name']
+        file_extension = file_name.split('.')[-1]
+        url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
+                                                             package_id,
+                                                             file_uuid,
+                                                             file_extension)
         resource_create(data_dict={'package_id': package_id,
                                    'name': file_name,
-                                   'url': '{}/file_uploader_ui/download/{}/{}'.format(toolkit.config.get('ckan.site_url'),
-                                                                                      package_id,
-                                                                                      file_uuid),
+                                   'url': url,
                                    'last_modified': datetime.datetime.utcnow()})
     package_show = toolkit.get_action('package_show')
     package_update = toolkit.get_action('package_update')
@@ -99,7 +105,7 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                u'file_uploader_ui_finish',
                                file_uploader_finish,
                                methods=['GET'])
-        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>',
+        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>.<file_extension>',
                                u'file_uploader_ui_download',
                                file_uploader_download,
                                methods=['GET'])
