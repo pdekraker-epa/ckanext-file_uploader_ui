@@ -25,7 +25,7 @@ def file_uploader_ui():
     os.makedirs(file_path)
     file_storage.save(os.path.join(file_path, 'file'))
     with open(os.path.join(file_path, 'metadata'), 'w') as f:
-        json.dump({'name': file_storage.filename}, f)
+        json.dump({'name': file_storage.filename, 'status': 'pending'}, f)
     file_extension = file_storage.filename.split('.')[-1]
     url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
                                                          package_id,
@@ -35,15 +35,19 @@ def file_uploader_ui():
                                'url': url}]})
 
 
-def file_uploader_download(package_id, file_uuid, file_extension=None):
+def file_uploader_download(package_id, file_id):
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
     assert package
+    file_uuid = '.'.join(file_id.split('.')[:-1]) if '.' in file_id else file_id
     file_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui',
                              package_id, file_uuid)
     with open(os.path.join(file_path, 'metadata')) as f:
-        file_name = json.load(f)['name']
+        metadata = json.load(f)
+        file_name = metadata['name']
+        file_status = metadata.get('status', 'active')
+    assert file_status == 'active', 'invalid file status: {}'.format(file_status)
     response = make_response(send_file(os.path.join(file_path, 'file')))
     response.headers["Content-Disposition"] = \
         "attachment;" \
@@ -60,22 +64,32 @@ def file_uploader_finish(package_id):
     assert package
     resource_create = toolkit.get_action('resource_create')
     package_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui', package_id)
+    file_metadatas = {}
     for file_uuid in os.listdir(package_path):
         file_path = os.path.join(package_path, file_uuid)
         with open(os.path.join(file_path, 'metadata')) as f:
-            file_name = json.load(f)['name']
-        file_extension = file_name.split('.')[-1]
-        url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
-                                                             package_id,
-                                                             file_uuid,
-                                                             file_extension)
-        resource_create(data_dict={'package_id': package_id,
-                                   'name': file_name,
-                                   'url': url,
-                                   'last_modified': datetime.datetime.utcnow()})
+            metadata = json.load(f)
+            file_name = metadata['name']
+            file_status = metadata.get('status', 'active')
+        if file_status == 'pending':
+            file_metadatas[file_path] = metadata
+            with open(os.path.join(file_path, 'metadata'), 'w') as f:
+                json.dump(dict(metadata, status='adding'), f)
+            file_extension = file_name.split('.')[-1]
+            url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
+                                                                 package_id,
+                                                                 file_uuid,
+                                                                 file_extension)
+            resource_create(data_dict={'package_id': package_id,
+                                       'name': file_name,
+                                       'url': url,
+                                       'last_modified': datetime.datetime.utcnow()})
     package_show = toolkit.get_action('package_show')
     package_update = toolkit.get_action('package_update')
     package = package_show(data_dict={'name_or_id': package_id})
+    for file_path, file_metadata in file_metadatas.items():
+        with open(os.path.join(file_path, 'metadata'), 'w') as f:
+            json.dump(dict(file_metadata, status='active'), f)
     package['state'] = 'active'
     package_update(data_dict=package)
     return redirect('/dataset/{}'.format(package_id))
@@ -105,13 +119,7 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                u'file_uploader_ui_finish',
                                file_uploader_finish,
                                methods=['GET'])
-        # old download route - kept for backwards compatibility
-        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>',
-                               u'file_uploader_ui_download',
-                               file_uploader_download,
-                               methods=['GET'])
-        # download route
-        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>.<file_extension>',
+        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_id>',
                                u'file_uploader_ui_download',
                                file_uploader_download,
                                methods=['GET'])
