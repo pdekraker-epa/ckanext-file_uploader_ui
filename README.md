@@ -15,6 +15,30 @@ Minimal supported CKAN version: 2.8.1
 * Add ``file_uploader_ui`` to the ``ckan.plugins`` setting in your CKAN
 * Restart CKAN.
 
+## Translations
+
+Translations are done in Transifex: https://www.transifex.com/the-public-knowledge-workshop/ckanext-file_uploader_ui
+
+### Updating translations code
+
+Update the .pot file - should be done in case of additional / modified strings in the templates
+
+```
+python setup.py extract_messages
+```
+
+Edit the .pot file and remove core ckan strings (which are there only because of extending core ckan templates)
+
+Leave only strings unique to odata.
+
+Translate and update the translations under i18n
+
+Compile translated po files
+
+```
+python setup.py compile_catalog
+```
+
 ## Updating the package on PYPI
 
 Update the version in `VERSION.txt`, then build and upload:

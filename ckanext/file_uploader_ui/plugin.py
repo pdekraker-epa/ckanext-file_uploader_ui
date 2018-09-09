@@ -7,6 +7,7 @@ import os
 import uuid
 import json
 import datetime
+from ckan.lib.plugins import DefaultTranslation
 
 
 def file_uploader_ui():
@@ -74,14 +75,18 @@ def file_uploader_finish(package_id):
     return redirect('/dataset/{}'.format(package_id))
 
 
-class File_Uploader_UiPlugin(plugins.SingletonPlugin):
+class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.ITranslation)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'file_uploader_ui')
+
+    def i18n_domain(self):
+        return 'ckanext-file_uploader_ui'
 
     def get_blueprint(self):
         blueprint = Blueprint(self.name, self.__module__)
