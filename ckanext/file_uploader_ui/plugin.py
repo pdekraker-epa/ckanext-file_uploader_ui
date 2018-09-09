@@ -35,7 +35,7 @@ def file_uploader_ui():
                                'url': url}]})
 
 
-def file_uploader_download(package_id, file_uuid, file_extension):
+def file_uploader_download(package_id, file_uuid, file_extension=None):
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
@@ -105,6 +105,12 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                u'file_uploader_ui_finish',
                                file_uploader_finish,
                                methods=['GET'])
+        # old download route - kept for backwards compatibility
+        blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>',
+                               u'file_uploader_ui_download',
+                               file_uploader_download,
+                               methods=['GET'])
+        # download route
         blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_uuid>.<file_extension>',
                                u'file_uploader_ui_download',
                                file_uploader_download,
