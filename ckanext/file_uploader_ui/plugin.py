@@ -10,6 +10,12 @@ import datetime
 from ckan.lib.plugins import DefaultTranslation
 
 
+try:
+    from ckanext.xloader.interfaces import IXloader
+except ImportError:
+    IXloader = None
+
+
 def file_uploader_ui():
     package_id = request.form['package_id']
     package_show = toolkit.get_action('package_show')
@@ -99,6 +105,8 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.ITranslation)
+    if IXloader:
+        plugins.implements(IXloader)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
@@ -124,3 +132,14 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                file_uploader_download,
                                methods=['GET'])
         return blueprint
+
+    def modify_download_request(self, url, resource, api_key, headers):
+        if 'file_uploader_ui' in url:
+            headers['Authorization'] = api_key
+        return url
+
+    def can_upload(self, resource_id):
+        return True
+
+    def after_upload(self, context, resource_dict, dataset_dict):
+        pass
