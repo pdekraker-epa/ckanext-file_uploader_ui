@@ -12,6 +12,9 @@ Minimal supported CKAN version: 2.8.1
 * Activate your CKAN virtual environment
 * Install the ckanext-file_uploader_ui package into your virtual environment:
   * `pip install ckanext-file_uploader_ui`
+* If you are using [xloader](https://github.com/ckan/ckanext-xloader) to load data into the datastore
+  * install this version of xloader (until [this PR](https://github.com/ckan/ckanext-xloader/pull/44) is merged)
+  * `pip install -U https://github.com/OriHoch/ckanext-xloader/archive/support-modifying-download-request.zip#egg=ckanext-xloader`
 * Add ``file_uploader_ui`` to the ``ckan.plugins`` setting in your CKAN
 * Restart CKAN.
 
