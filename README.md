@@ -32,15 +32,24 @@ python setup.py extract_messages
 
 Edit the .pot file and remove core ckan strings (which are there only because of extending core ckan templates)
 
-Leave only strings unique to odata.
+Upload pot to transifex, translate on transifex
 
-Translate and update the translations under i18n
-
-Compile translated po files
+Install [Transifex client](https://docs.transifex.com/client/installing-the-client) and pull updated translations from Transifex
 
 ```
-python setup.py compile_catalog
+tx pull --all
 ```
+
+Compile translations
+
+```
+msgfmt -o ckanext/file_uploader_ui/i18n/ar/LC_MESSAGES/ckanext-file_uploader_ui.mo \
+          ckanext/file_uploader_ui/i18n/ar/LC_MESSAGES/ckanext-file_uploader_ui.po &&\
+msgfmt -o ckanext/file_uploader_ui/i18n/he/LC_MESSAGES/ckanext-file_uploader_ui.mo \
+          ckanext/file_uploader_ui/i18n/he/LC_MESSAGES/ckanext-file_uploader_ui.po
+```
+
+Commit
 
 ## Updating the package on PYPI
 

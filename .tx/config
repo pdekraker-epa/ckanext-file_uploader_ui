@@ -1,0 +1,9 @@
+[main]
+host = https://www.transifex.com
+
+[ckanext-file_uploader_ui.ckanext-file_uploader_uipot]
+file_filter = ckanext/file_uploader_ui/i18n/<lang>/LC_MESSAGES/ckanext-file_uploader_ui.po
+source_file = ckanext/file_uploader_ui/i18n/ckanext-file_uploader_ui.pot
+source_lang = en
+type = PO
+
