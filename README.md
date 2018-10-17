@@ -34,30 +34,10 @@ Edit the .pot file and remove core ckan strings (which are there only because of
 
 Upload pot to transifex, translate on transifex
 
-Install [Transifex client](https://docs.transifex.com/client/installing-the-client) and pull updated translations from Transifex
+Install [Transifex client](https://docs.transifex.com/client/installing-the-client)
 
 ```
-tx pull --all
+./release.sh --update-translations
 ```
 
-Compile translations
-
-```
-msgfmt -o ckanext/file_uploader_ui/i18n/ar/LC_MESSAGES/ckanext-file_uploader_ui.mo \
-          ckanext/file_uploader_ui/i18n/ar/LC_MESSAGES/ckanext-file_uploader_ui.po &&\
-msgfmt -o ckanext/file_uploader_ui/i18n/he/LC_MESSAGES/ckanext-file_uploader_ui.mo \
-          ckanext/file_uploader_ui/i18n/he/LC_MESSAGES/ckanext-file_uploader_ui.po
-```
-
-Commit
-
-## Updating the package on PYPI
-
-Update the version in `VERSION.txt`, then build and upload:
-
-```
-python setup.py sdist &&\
-twine upload dist/ckanext-file_uploader_ui-$(cat VERSION.txt).tar.gz
-```
-
-ckanext-file_uploader_ui should be availabe on PyPI as https://pypi.python.org/pypi/ckanext-file_uploader_ui.
+Test the updated translations and commit the changes
