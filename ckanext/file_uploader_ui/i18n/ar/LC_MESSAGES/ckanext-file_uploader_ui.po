@@ -1,46 +1,45 @@
-# Arabic translations for ckanext-file_uploader_ui.
+# Translations template for ckanext-file_uploader_ui.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the
 # ckanext-file_uploader_ui project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
-#
+# 
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-file_uploader_ui 0.0.6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-09-09 15:20+0300\n"
-"PO-Revision-Date: 2018-09-09 15:21+0300\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ar\n"
-"Language-Team: ar <LL@li.org>\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n>=3 "
-"&& n<=10 ? 3 : n>=11 && n<=99 ? 4 : 5)\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: o data <1nonameblog@gmail.com>, 2018\n"
+"Language-Team: Arabic (https://www.transifex.com/the-public-knowledge-workshop/teams/89938/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:8
 msgid "Bulk Upload"
-msgstr ""
+msgstr "تحميل شامل"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:10
 msgid "Drag & Drop files here to initiate bulk upload"
-msgstr ""
+msgstr "اسحب واترك الملفّات هنا لكي يبدأ التحميل الشامل"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:17
 msgid "Add files..."
-msgstr ""
+msgstr "اضف ملفّات"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:22
 msgid "Finish"
-msgstr ""
+msgstr "نهاية"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:60
 msgid "Processing..."
-msgstr ""
+msgstr "معالجة"
 
 #: ckanext/file_uploader_ui/templates/package/new_resource.html:99
 msgid "Error"
-msgstr ""
-
+msgstr "خطأ"
