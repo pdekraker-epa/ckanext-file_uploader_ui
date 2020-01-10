@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block secondary_content %}
+  <div class="hide-on-bulk-upload">
+  {{ super() }}
+  </div>
+  {% if h.check_access('package_update', {'id':pkg.id }) %}
+    {% snippet 'ckanext-file_uploader_ui/upload.html' %}
+  {% endif %}
+{% endblock %}
