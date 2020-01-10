@@ -1,5 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.lib.helpers import flash_success
+from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
 from urllib import quote
 from werkzeug.datastructures import FileStorage
@@ -74,6 +76,7 @@ def file_uploader_finish(package_id):
     resource_create = toolkit.get_action('resource_create')
     package_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui', package_id)
     file_metadatas = {}
+    uploads = {'updated': [], 'created': []}
     for file_uuid in os.listdir(package_path):
         file_path = os.path.join(package_path, file_uuid)
         with open(os.path.join(file_path, 'metadata')) as f:
@@ -106,11 +109,15 @@ def file_uploader_finish(package_id):
                     "revision_id": str(uuid.uuid4()),
                     'url': url
                 })
+                uploads['updated'].append(file_name)
             else:
                 resource_create(data_dict={'package_id': package_id,
                                            'name': file_name,
                                            'url': url,
+                                           'url_type': "file_uploader_ui",
                                            'last_modified': datetime.datetime.utcnow()})
+                uploads['created'].append(file_name)
+
     package_show = toolkit.get_action('package_show')
     package_update = toolkit.get_action('package_update')
     package = package_show(data_dict={'name_or_id': package_id})
@@ -119,6 +126,14 @@ def file_uploader_finish(package_id):
             json.dump(dict(file_metadata, status='active'), f)
     package['state'] = 'active'
     package_update(data_dict=package)
+    if uploads['created']:
+        flash_success('The following resources were created: {}'.format(
+            ', '.join(uploads['created'])
+        ))
+    if uploads['updated']:
+        flash_success('The following resources were updated: {}'.format(
+            ', '.join(uploads['updated'])
+        ))
     return redirect('/dataset/{}'.format(package_id))
 
 
