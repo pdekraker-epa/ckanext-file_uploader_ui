@@ -1,5 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+
 from ckan.lib.helpers import flash_success
 from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
@@ -72,7 +73,6 @@ def file_uploader_finish(package_id):
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
     assert package
-    log.warning(package)
     resource_create = toolkit.get_action('resource_create')
     package_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui', package_id)
     file_metadatas = {}
@@ -134,7 +134,11 @@ def file_uploader_finish(package_id):
         flash_success('The following resources were updated: {}'.format(
             ', '.join(uploads['updated'])
         ))
-    return redirect('/dataset/{}'.format(package_id))
+
+    return redirect("/{}/dataset/{}".format(
+        request.environ.get('CKAN_LANG'),
+        package_id
+    ))
 
 
 class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
