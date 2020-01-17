@@ -1,7 +1,6 @@
 {% resource 'file_uploader_ui/fileupload_styles' %}
 {% resource 'file_uploader_ui/fileupload_scripts' %}
-
-<section class="module module-narrow module-shallow">
+<section class="module module-narrow module-shallow drag-and-drop">
     <h2 class="module-heading"><i class="fa fa-upload"></i> {{ _('Bulk Upload') }}</h2>
     <div class="module-content">
         <p>{{ _('Drag & Drop files here to initiate bulk upload') }}</p>
@@ -10,12 +9,12 @@
             <div class="row fileupload-buttonbar">
                 <div class="col-lg-7">
                     <span class="btn btn-success fileinput-button">
-                        <i class="glyphicon glyphicon-plus"></i>
+                        <i class="fa fa-plus"></i>
                         <span>{{ _('Add files...') }}</span>
                         <input type="file" name="files[]" multiple>
                     </span>
-                    <a href="{{h.lang()}}/file_uploader_ui/finish/{% if c.pkg_dict.name %}{{ c.pkg_dict.name }}{% else %}{{ pkg_name }}{% endif %}" class="btn btn-default">
-                        <i class="glyphicon glyphicon-check"></i>
+                    <a href="/{{h.lang()}}/file_uploader_ui/finish/{% if c.pkg_dict.name %}{{ c.pkg_dict.name }}{% else %}{{ pkg_name }}{% endif %}" class="btn btn-default fileinput-finish">
+                        <i class="fa fa-check"></i>
                         <span>{{ _('Finish') }}</span>
                     </a>
                     <!--<button type="submit" class="btn btn-primary start hidden">-->
