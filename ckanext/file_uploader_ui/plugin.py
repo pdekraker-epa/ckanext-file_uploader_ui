@@ -127,11 +127,11 @@ def file_uploader_finish(package_id):
     package['state'] = 'active'
     package_update(data_dict=package)
     if uploads['created']:
-        flash_success('The following resources were created: {}'.format(
+        flash_success(_('The following resources were created: {}').format(
             ', '.join(uploads['created'])
         ))
     if uploads['updated']:
-        flash_success('The following resources were updated: {}'.format(
+        flash_success(_('The following resources were updated: {}').format(
             ', '.join(uploads['updated'])
         ))
 
