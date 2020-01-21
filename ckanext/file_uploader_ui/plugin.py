@@ -34,7 +34,7 @@ def file_uploader_ui():
     file_uuid = str(uuid.uuid4())
     file_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
-        toolkit.config.get('ckanext.file_uploader_ui_path', 'resources'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id,
         file_uuid
     )
@@ -66,7 +66,7 @@ def file_uploader_download(package_id, file_id):
     file_uuid = '.'.join(file_id.split('.')[:-1]) if '.' in file_id else file_id
     file_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
-        toolkit.config.get('ckanext.file_uploader_ui_path', 'resources'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id,
         file_uuid
     )
@@ -95,7 +95,7 @@ def file_uploader_finish(package_id):
     resource_create = toolkit.get_action('resource_create')
     package_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
-        toolkit.config.get('ckanext.file_uploader_ui_path', 'resources'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id
     )
     file_metadatas = {}
