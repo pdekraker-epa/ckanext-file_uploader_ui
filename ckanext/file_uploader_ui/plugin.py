@@ -26,34 +26,52 @@ def file_uploader_ui():
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
+    package_id = package['id']
     assert package
     files = request.files.values()
     assert len(files) == 1
     file_storage = files[0] # type: FileStorage
     file_uuid = str(uuid.uuid4())
-    file_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui',
-                             package_id, file_uuid)
+    file_path = os.path.join(
+        toolkit.config.get('ckan.storage_path'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
+        package_id,
+        file_uuid
+    )
+    # Keep these logs appearing in production for the Jan 2020 West Africa meet
+    log.warning("Bulk uploading file to path: {}".format(file_path))
+
     os.makedirs(file_path)
     file_storage.save(os.path.join(file_path, 'file'))
     with open(os.path.join(file_path, 'metadata'), 'w') as f:
         json.dump({'name': file_storage.filename, 'status': 'pending'}, f)
     file_extension = file_storage.filename.split('.')[-1]
-    url = '{}/file_uploader_ui/download/{}/{}.{}'.format(toolkit.config.get('ckan.site_url'),
-                                                         package_id,
-                                                         file_uuid,
-                                                         file_extension)
-    return jsonify({'files': [{'name': file_storage.filename,
-                               'url': url}]})
+    url = '{}/file_uploader_ui/download/{}/{}.{}'.format(
+        toolkit.config.get('ckan.site_url'),
+        package_id,
+        file_uuid,
+        file_extension
+    )
+    return jsonify(
+        {'files': [{'name': file_storage.filename, 'url': url}]}
+    )
 
 
 def file_uploader_download(package_id, file_id):
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
+    package_id = package['id']
     assert package
     file_uuid = '.'.join(file_id.split('.')[:-1]) if '.' in file_id else file_id
-    file_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui',
-                             package_id, file_uuid)
+    file_path = os.path.join(
+        toolkit.config.get('ckan.storage_path'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
+        package_id,
+        file_uuid
+    )
+    # Keep these logs appearing in production for the Jan 2020 West Africa meet
+    log.warning("Downloading file from path: {}".format(file_path))
     with open(os.path.join(file_path, 'metadata')) as f:
         metadata = json.load(f)
         file_name = metadata['name']
@@ -73,8 +91,13 @@ def file_uploader_finish(package_id):
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
     assert package
+    package_id = package['id']
     resource_create = toolkit.get_action('resource_create')
-    package_path = os.path.join(toolkit.config.get('ckan.storage_path'), 'file_uploader_ui', package_id)
+    package_path = os.path.join(
+        toolkit.config.get('ckan.storage_path'),
+        toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
+        package_id
+    )
     file_metadatas = {}
     uploads = {'updated': [], 'created': []}
     for file_uuid in os.listdir(package_path):

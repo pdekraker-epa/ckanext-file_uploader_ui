@@ -14,6 +14,7 @@ $(function () {
             $('aside.secondary section:first').hide();
             $('#fileupload button.start').removeClass('hidden');
             $('#fileupload button.cancel').removeClass('hidden');
+            $('.hide-on-bulk-upload').addClass('hidden');
             $(this).removeClass('fileupload-processing');
         }
     });
