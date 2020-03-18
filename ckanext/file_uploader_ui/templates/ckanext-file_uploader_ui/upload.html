@@ -1,5 +1,6 @@
 {% resource 'file_uploader_ui/fileupload_styles' %}
 {% resource 'file_uploader_ui/fileupload_scripts' %}
+
 <section class="module module-narrow module-shallow drag-and-drop">
     <h2 class="module-heading"><i class="fa fa-upload"></i> {{ _('Bulk Upload') }}</h2>
     <div class="module-content">
@@ -13,7 +14,20 @@
                         <span>{{ _('Add files...') }}</span>
                         <input type="file" name="files[]" multiple>
                     </span>
-                    <a href="/{{h.lang()}}/file_uploader_ui/finish/{% if c.pkg_dict.name %}{{ c.pkg_dict.name }}{% else %}{{ pkg_name }}{% endif %}" class="btn btn-default fileinput-finish">
+
+                    {% if c.pkg_dict.name %}
+                      {% set package_id = c.pkg_dict.name %}
+                    {% else %}
+                      {% set package_id = pkg_name %}
+                    {% endif %}
+
+                    {% if schema and resource_type %}
+                      {% set url = h.url_for('file_uploader_ui.file_uploader_ui_finish', package_id=package_id, package_type=schema.dataset_type, resource_type=resource_type) %}
+                    {% else %}
+                      {% set url = h.url_for('file_uploader_ui.file_uploader_ui_finish', package_id=package_id) %}
+                    {% endif %}
+
+                    <a href="{{url}}" class="btn btn-default fileinput-finish">
                         <i class="fa fa-check"></i>
                         <span>{{ _('Finish') }}</span>
                     </a>
