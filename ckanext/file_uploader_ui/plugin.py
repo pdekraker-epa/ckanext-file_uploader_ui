@@ -1,6 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-
+from ckanext.scheming.helpers import scheming_get_dataset_schema
 from ckan.lib.helpers import flash_success
 from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
@@ -86,7 +86,7 @@ def file_uploader_download(package_id, file_id):
     return response
 
 
-def file_uploader_finish(package_id):
+def file_uploader_finish(package_id, package_type=None, resource_type=None):
     package_show = toolkit.get_action('package_show')
     # this ensures current user is authorized to view the package
     package = package_show(data_dict={'name_or_id': package_id})
@@ -134,11 +134,19 @@ def file_uploader_finish(package_id):
                 })
                 uploads['updated'].append(file_name)
             else:
-                resource_create(data_dict={'package_id': package_id,
-                                           'name': file_name,
-                                           'url': url,
-                                           'url_type': "file_uploader_ui",
-                                           'last_modified': datetime.datetime.utcnow()})
+                data_dict = {
+                    'package_id': package_id,
+                    'name': file_name,
+                    'url': url,
+                    'url_type': "file_uploader_ui",
+                    'last_modified': datetime.datetime.utcnow()
+                }
+                data_dict = _merge_with_schema_default_values(
+                    package_type,
+                    resource_type,
+                    data_dict
+                )
+                resource_create(data_dict=data_dict)
                 uploads['created'].append(file_name)
 
     package_show = toolkit.get_action('package_show')
@@ -164,6 +172,36 @@ def file_uploader_finish(package_id):
     ))
 
 
+def _merge_with_schema_default_values(package_type, resource_type, data_dict):
+    """
+    This function merges the file uploader default resource with the default
+    values specified in the ckanext-schemining schema. It allows us to bulk
+    upload multiple copies ofa particular resource type e.g. multiple spectrum
+    files.
+    """
+    # If no package_type or resource_type we can't do this.
+    if not (package_type and resource_type):
+        return data_dict
+
+    schema = scheming_get_dataset_schema(package_type)
+    resource_schemas = schema.get("resource_schemas", {})
+    resource_schema = resource_schemas.get(resource_type, {})
+    file_name = data_dict['name']
+
+    # Step through each field and merge in the default value if it exits.
+    for field in resource_schema.get('resource_fields', []):
+        value = field.get('default', field.get('field_value'))
+        if value:
+            data_dict[field['field_name']] = value
+
+    # Multiple resources with the same name is confusing, so merge in filename
+    data_dict['name'] = "{}: {}".format(
+        data_dict.get('name', ""),
+        file_name
+    )
+    return data_dict
+
+
 class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IBlueprint)
@@ -187,6 +225,10 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                file_uploader_ui,
                                methods=['POST'])
         blueprint.add_url_rule(u'/file_uploader_ui/finish/<package_id>',
+                               u'file_uploader_ui_finish',
+                               file_uploader_finish,
+                               methods=['GET'])
+        blueprint.add_url_rule(u'/file_uploader_ui/finish/<package_id>/<package_type>/<resource_type>',
                                u'file_uploader_ui_finish',
                                file_uploader_finish,
                                methods=['GET'])
