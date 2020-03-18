@@ -178,11 +178,12 @@ def _merge_with_configured_defaults(data_dict):
     Allow configurable default values for resource properties created through
     file uploader. These are configured through a json string in the config.
     """
-    defaults = toolkit.config('ckanext.file_uploader_ui_defaults')
-    defaults = json.loads(defaults)
-    for key, value in defaults:
-        data_dict[key] = value
-    return defaults
+    defaults = toolkit.config.get('ckanext.file_uploader_ui_defaults', "")
+    if defaults:
+        defaults = json.loads(defaults)
+        for key, value in defaults.items():
+            data_dict[key] = value
+    return data_dict
 
 
 def _merge_with_schema_default_values(package_type, resource_type, data_dict):
