@@ -141,6 +141,7 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
                     'url_type': "file_uploader_ui",
                     'last_modified': datetime.datetime.utcnow()
                 }
+                data_dict = _merge_with_configured_defaults(data_dict)
                 data_dict = _merge_with_schema_default_values(
                     package_type,
                     resource_type,
@@ -170,6 +171,18 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
         request.environ.get('CKAN_LANG'),
         package_id
     ))
+
+
+def _merge_with_configured_defaults(data_dict):
+    """
+    Allow configurable default values for resource properties created through
+    file uploader. These are configured through a json string in the config.
+    """
+    defaults = toolkit.config('ckanext.file_uploader_ui_defaults')
+    defaults = json.loads(defaults)
+    for key, value in defaults:
+        data_dict[key] = value
+    return defaults
 
 
 def _merge_with_schema_default_values(package_type, resource_type, data_dict):
