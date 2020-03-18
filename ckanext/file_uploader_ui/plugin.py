@@ -203,6 +203,10 @@ def _merge_with_schema_default_values(package_type, resource_type, data_dict):
 
     # Step through each field and merge in the default value if it exits.
     for field in resource_schema.get('resource_fields', []):
+        if field['field_name'] == 'restricted':
+            # TODO: Would be nice if restricted didn't need special treatment
+            data_dict["restricted_allowed_users"] = field.get('default_users', "")
+            data_dict["restricted_allowed_orgs"] = field.get('default_organizations', "")
         value = field.get('default', field.get('field_value'))
         if value:
             data_dict[field['field_name']] = value
