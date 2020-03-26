@@ -53,43 +53,43 @@ msgstr "Erreur"
 
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:4
 msgid "Manage"
-msgstr ""
+msgstr "Éditer"
 
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:11
 msgid "View"
-msgstr ""
+msgstr "Afficher"
 
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:13
 msgid "API Endpoint"
-msgstr ""
+msgstr "Point d'accès API"
 
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:15
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:19
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:19
 msgid "Download"
-msgstr ""
+msgstr "Télécharger"
 
 #: ckanext/file_uploader_ui/templates/package/resource_read.html:17
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:22
 msgid "Go to resource"
-msgstr ""
+msgstr "Aller à la ressource"
 
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:7
 msgid "Preview"
-msgstr ""
+msgstr "Aperçu"
 
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:10
 msgid "More information"
-msgstr ""
+msgstr "Plus d'information"
 
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:31
 msgid "Edit"
-msgstr ""
+msgstr "Éditer"
 
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:37
 msgid "Are you sure you want to delete this resource?"
-msgstr ""
+msgstr "Etes-vous sûr de vouloir supprimer cette ressource?"
 
 #: ckanext/file_uploader_ui/templates/package/snippets/resource_item.html:39
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
