@@ -1,6 +1,7 @@
 {% ckan_extends %}
 
-{% block secondary_content %}
+{# {% block secondary_content %} #}
+{% block primary_content_inner %} 
     {{ super() }}
     {% include 'ckanext-file_uploader_ui/upload.html' %}
 {% endblock %}
