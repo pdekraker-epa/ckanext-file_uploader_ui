@@ -15,11 +15,6 @@ from ckan.lib.plugins import DefaultTranslation
 
 log = logging.getLogger()
 
-try:
-    from ckanext.xloader.interfaces import IXloader
-except ImportError:
-    IXloader = None
-
 
 def file_uploader_ui():
     package_id = request.form['package_id']
@@ -144,8 +139,6 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.ITranslation)
-    if IXloader:
-        plugins.implements(IXloader)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
@@ -166,10 +159,10 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                u'file_uploader_ui_finish',
                                file_uploader_finish,
                                methods=['GET'])
-        blueprint.add_url_rule(u'/file_uploader_ui/finish/<package_id>/<package_type>/<resource_type>',
-                               u'file_uploader_ui_finish',
-                               file_uploader_finish,
-                               methods=['GET'])
+        # blueprint.add_url_rule(u'/file_uploader_ui/finish/<package_id>/<package_type>/<resource_type>',
+                               # u'file_uploader_ui_finish',
+                               # file_uploader_finish,
+                               # methods=['GET'])
         # blueprint.add_url_rule(u'/file_uploader_ui/download/<package_id>/<file_id>',
                                # u'file_uploader_ui_download',
                                # file_uploader_download,
