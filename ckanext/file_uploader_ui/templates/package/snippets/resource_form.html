@@ -1,0 +1,6 @@
+{% ckan_extends %}
+
+{% block again_button %}
+{{ super() }}
+<a class="btn btn-primary" href="{{h.url_for('file_uploader_ui.file_uploader_ui_add_resources', package_id=pkg_name) }}"> {{ _('Switch to bulk add') }}</a>
+{% endblock %}
