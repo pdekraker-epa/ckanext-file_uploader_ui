@@ -5,7 +5,8 @@ $(function () {
     let firstAdd = false;
     $('#fileupload').fileupload({
         url: '/file_uploader_ui/upload',
-        autoUpload: true
+        autoUpload: true,
+        maxChunkSize: 5000000
     }).bind('fileuploadadd', function(e, data) {
         if (!firstAdd) {
             firstAdd = true;

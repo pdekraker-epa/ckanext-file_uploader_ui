@@ -5,7 +5,9 @@ import ckan.lib.helpers as h
 from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
 from urllib import quote
-from werkzeug.datastructures import FileStorage
+from werkzeug.datastructures import FileStorage, ContentRange
+from werkzeug.http import parse_content_range_header
+
 import os
 import uuid
 import json
@@ -13,7 +15,7 @@ import datetime
 import logging
 from ckan.lib.plugins import DefaultTranslation
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def file_uploader_ui():
@@ -26,26 +28,48 @@ def file_uploader_ui():
     files = request.files.values()
     assert len(files) == 1
     file_storage = files[0] # type: FileStorage
-    file_uuid = str(uuid.uuid4())
-    file_path = os.path.join(
+    file_range = parse_content_range_header(request.headers.get('Content-Range'))
+
+    log.info("File Uploader Received File: {} [{} / {}]".format(file_storage, file_range.stop, file_range.length))
+
+    storage_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
         toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id)
     # Keep these logs appearing in production for the Jan 2020 West Africa meet
-    log.info("Bulk uploading file to path: {}".format(file_path))
+
 
     try:
-        os.makedirs(file_path)
+        os.makedirs(storage_path)
     except OSError as e:
         # errno 17 is file already exists
         if e.errno != 17:
             raise
 
-    file = os.path.join(file_path, file_storage.filename)
-    file_storage.save(file)
-    # with open(os.path.join(file_path, 'metadata'), 'w') as f:
-        # json.dump({'name': file_storage.filename, 'status': 'pending'}, f)
-    return jsonify({'files': [{'name': file_storage.filename, 'size':os.path.getsize(file)}]})
+    file_path = os.path.join(storage_path, file_storage.filename)
+
+    log.info("Bulk uploading to temporary file: {}".format(file_path))
+
+    try:
+
+        if 0 and os.path.exists(file_path) and file_range.start == 0:
+            # Abort if file exists already
+            return toolkit.abort(400, 'File with that name already in progress')
+        elif file_range.start == 0:
+            with open(file_path, 'wb') as f:
+                f.write(file_storage.stream.read())
+        else:
+            with open(file_path, 'ab') as f:
+                f.seek(file_range.start)
+                f.write(file_storage.stream.read())
+
+    except OSError:
+        # log.exception will include the traceback so we can see what's wrong
+        log.exception('Failed to write content to file {}'.format(file_path))
+        return toolkit.abort(500, 'File upload failed')
+
+    return jsonify({'files': [{'name': file_storage.filename, 'size':os.path.getsize(file_path)}]})
+
 
 def file_uploader_finish(package_id, package_type=None, resource_type=None):
     package_show = toolkit.get_action('package_show')
@@ -71,10 +95,6 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
                 'upload': file_upload_storage,
                 'last_modified': datetime.datetime.utcnow() }
             data_dict = _merge_with_configured_defaults(data_dict)
-            # data_dict = _merge_with_schema_default_values(
-                # package_type,
-                # resource_type,
-                # data_dict)
             resource_create(data_dict=data_dict)
             uploads.append(file_name)
         os.remove(file_path)
@@ -83,6 +103,7 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
         h.flash_success(_('The following resources were created: {}').format(', '.join(uploads)))
 
     return toolkit.redirect_to(controller='package', action='resources', id=package_id)
+
 
 def _merge_with_configured_defaults(data_dict):
     """
@@ -95,6 +116,7 @@ def _merge_with_configured_defaults(data_dict):
         for key, value in defaults.items():
             data_dict[key] = value
     return data_dict
+
 
 def file_uploader_add_resources(package_id):
     package_show = toolkit.get_action('package_show')
@@ -136,13 +158,13 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return blueprint
 
-    def modify_download_request(self, url, resource, api_key, headers):
-        if 'file_uploader_ui' in url:
-            headers['Authorization'] = api_key
-        return url
-
-    def can_upload(self, resource_id):
-        return True
-
-    def after_upload(self, context, resource_dict, dataset_dict):
-        pass
+    # def modify_download_request(self, url, resource, api_key, headers):
+    #     if 'file_uploader_ui' in url:
+    #         headers['Authorization'] = api_key
+    #     return url
+    #
+    # def can_upload(self, resource_id):
+    #     return True
+    #
+    # def after_upload(self, context, resource_dict, dataset_dict):
+    #     pass
