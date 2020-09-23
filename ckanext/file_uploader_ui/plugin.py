@@ -30,7 +30,11 @@ def file_uploader_ui():
     file_storage = files[0] # type: FileStorage
     file_range = parse_content_range_header(request.headers.get('Content-Range'))
 
-    log.info("File Uploader Received File: {} [{} / {}]".format(file_storage, file_range.stop, file_range.length))
+
+    if file_range:
+        log.info("File Uploader Received File: {} [{} / {}]".format(file_storage.filename, file_range.stop, file_range.length))
+    else:
+        log.info("File Uploader Received File: {}".format(file_storage.filename))
 
     storage_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
@@ -47,7 +51,6 @@ def file_uploader_ui():
             raise
 
     file_path = os.path.join(storage_path, file_storage.filename)
-
     log.info("Bulk uploading to temporary file: {}".format(file_path))
 
     try:
@@ -55,7 +58,7 @@ def file_uploader_ui():
         if 0 and os.path.exists(file_path) and file_range.start == 0:
             # Abort if file exists already
             return toolkit.abort(400, 'File with that name already in progress')
-        elif file_range.start == 0:
+        elif file_range is None or file_range.start == 0:
             with open(file_path, 'wb') as f:
                 f.write(file_storage.stream.read())
         else:
