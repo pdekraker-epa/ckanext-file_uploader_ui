@@ -32,9 +32,9 @@ def file_uploader_ui():
 
 
     if file_range:
-        log.info("File Uploader Received File: {} [{} / {}]".format(file_storage.filename, file_range.stop, file_range.length))
+        log.debug("File Uploader Received File: %s [%d / %d]",file_storage.filename, file_range.stop, file_range.length)
     else:
-        log.info("File Uploader Received File: {}".format(file_storage.filename))
+        log.debug("File Uploader Received File: %s",file_storage.filename)
 
     storage_path = os.path.join(
         toolkit.config.get('ckan.storage_path'),
@@ -51,7 +51,6 @@ def file_uploader_ui():
             raise
 
     file_path = os.path.join(storage_path, file_storage.filename)
-    log.info("Bulk uploading to temporary file: {}".format(file_path))
 
     try:
 
@@ -59,6 +58,7 @@ def file_uploader_ui():
             # Abort if file exists already
             return toolkit.abort(400, 'File with that name already in progress')
         elif file_range is None or file_range.start == 0:
+            log.debug("Bulk uploading to temporary file %s",file_path)
             with open(file_path, 'wb') as f:
                 f.write(file_storage.stream.read())
         else:
@@ -68,7 +68,7 @@ def file_uploader_ui():
 
     except OSError:
         # log.exception will include the traceback so we can see what's wrong
-        log.exception('Failed to write content to file {}'.format(file_path))
+        log.exception('Failed to write content to file %s',file_path)
         return toolkit.abort(500, 'File upload failed')
 
     return jsonify({'files': [{'name': file_storage.filename, 'size':os.path.getsize(file_path)}]})
@@ -86,7 +86,9 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
         toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id
     )
-    file_metadatas = {}
+
+    log.info("Adding bulk uploaded files to dataset %s",package_id)
+
     uploads = []
     for file_name in os.listdir(package_path):
         file_path = os.path.join(package_path, file_name)
