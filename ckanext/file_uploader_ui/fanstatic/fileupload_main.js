@@ -6,7 +6,7 @@ $(function () {
     $('#fileupload').fileupload({
         url: '/file_uploader_ui/upload',
         autoUpload: true,
-        maxChunkSize: 5000000
+        maxChunkSize: 5000000,
     }).bind('fileuploadadd', function(e, data) {
         if (!firstAdd) {
             firstAdd = true;
@@ -19,4 +19,6 @@ $(function () {
             $(this).removeClass('fileupload-processing');
         }
     });
+
+//    $('#fileupload').addClass('fileupload-processing');
 });

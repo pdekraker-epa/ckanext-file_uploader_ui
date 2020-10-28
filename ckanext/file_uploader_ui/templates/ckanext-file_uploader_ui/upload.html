@@ -1,12 +1,21 @@
-{% resource 'file_uploader_ui/fileupload_styles' %}
-{% resource 'file_uploader_ui/fileupload_scripts' %}
+{% asset 'file_uploader_ui/fileupload_styles' %}
+{% asset 'file_uploader_ui/fileupload_scripts' %}
 
 <section class="module module-narrow module-shallow drag-and-drop">
     <h2 class="module-heading"><i class="fa fa-upload"></i> {{ _('Bulk Upload') }}</h2>
     <div class="module-content">
         <p>{{ _('Drag & Drop files here to stage for bulk upload') }}</p>
         <form id="fileupload" action="/file_uploader_ui/upload" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="package_id" value="{% if c.pkg_dict.name %}{{ c.pkg_dict.name }}{% else %}{{ pkg_name }}{% endif %}" />
+
+            {% if c.pkg_dict.name %}
+              {% set package_id = c.pkg_dict.name %}
+            {% else %}
+              {% set package_id = pkg_name %}
+            {% endif %}
+
+            {% set url = h.url_for('file_uploader_ui.file_uploader_ui_finish', package_id=package_id) %}
+
+            <input type="hidden" name="package_id" value="{{ package_id }}" />
             <div class="row fileupload-buttonbar">
                 <div class="col-lg-5">
                     <span class="btn btn-success fileinput-button">
@@ -14,18 +23,6 @@
                         <span>{{ _('Add files...') }}</span>
                         <input type="file" name="files[]" multiple>
                     </span>
-
-                    {% if c.pkg_dict.name %}
-                      {% set package_id = c.pkg_dict.name %}
-                    {% else %}
-                      {% set package_id = pkg_name %}
-                    {% endif %}
-
-                    {% if schema and resource_type %}
-                      {% set url = h.url_for('file_uploader_ui.file_uploader_ui_finish', package_id=package_id, package_type=schema.dataset_type, resource_type=resource_type) %}
-                    {% else %}
-                      {% set url = h.url_for('file_uploader_ui.file_uploader_ui_finish', package_id=package_id) %}
-                    {% endif %}
 
                     <a href="{{url}}" class="btn btn-default fileinput-finish">
                         <i class="fa fa-check"></i><span>{{ _('Finish') }}</span>
@@ -40,6 +37,7 @@
             </div>
             <ul class="resource-list files" ></ul>
         </form>
+
         {% raw %}
             <script id="template-upload" type="text/x-tmpl">
             {% for (var i=0, file; file=o.files[i]; i++) { %}

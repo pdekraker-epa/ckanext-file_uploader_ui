@@ -4,7 +4,7 @@ import ckan.plugins.toolkit as toolkit
 import ckan.lib.helpers as h
 from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
-from urllib import quote
+#from urllib import quote
 from werkzeug.datastructures import FileStorage, ContentRange
 from werkzeug.http import parse_content_range_header
 
@@ -25,11 +25,9 @@ def file_uploader_ui():
     package = package_show(data_dict={'name_or_id': package_id})
     package_id = package['id']
     assert package
-    files = request.files.values()
-    assert len(files) == 1
-    file_storage = files[0] # type: FileStorage
-    file_range = parse_content_range_header(request.headers.get('Content-Range'))
 
+    file_storage = request.files['files[]'] # type: FileStorage
+    file_range = parse_content_range_header(request.headers.get('Content-Range'))
 
     if file_range:
         log.info("File Uploader Received File: {} [{} / {}]".format(file_storage.filename, file_range.stop, file_range.length))
@@ -41,7 +39,6 @@ def file_uploader_ui():
         toolkit.config.get('ckanext.file_uploader_ui_path', 'file_uploader_ui'),
         package_id)
     # Keep these logs appearing in production for the Jan 2020 West Africa meet
-
 
     try:
         os.makedirs(storage_path)
@@ -90,7 +87,7 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
     uploads = []
     for file_name in os.listdir(package_path):
         file_path = os.path.join(package_path, file_name)
-        with open(file_path,'r') as f:
+        with open(file_path,'rb') as f:
             file_upload_storage = FileStorage(f)
             data_dict = {
                 'package_id': package_id,
@@ -105,7 +102,7 @@ def file_uploader_finish(package_id, package_type=None, resource_type=None):
     if uploads:
         h.flash_success(_('The following resources were created: {}').format(', '.join(uploads)))
 
-    return toolkit.redirect_to(controller='package', action='resources', id=package_id)
+    return toolkit.redirect_to('dataset.resources', id=package_id)
 
 
 def _merge_with_configured_defaults(data_dict):

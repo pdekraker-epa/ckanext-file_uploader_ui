@@ -1,0 +1,25 @@
+
+fileupload_scripts:
+    contents:
+        - jquery.ui.widget.js
+        - tmpl.js
+        - jquery.iframe-transport.js
+        - jquery.fileupload.js
+        - jquery.fileupload-process.js
+        - jquery.fileupload-validate.js
+        - jquery.fileupload-ui.js
+        - fileupload_main.js
+    output: file_uploader_ui/%(version)s_fileupload.js
+    extra:
+        preload:
+            - base/main
+            - vendor/jquery
+
+
+
+fileupload_styles:
+    contents:
+        - jquery.fileupload.css
+        - jquery.fileupload-ui.css
+    output: file_uploader_ui/%(version)s_fileupload.css
+    filters: cssrewrite
