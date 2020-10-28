@@ -1,10 +1,10 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-# from ckanext.scheming.helpers import scheming_get_dataset_schema
 import ckan.lib.helpers as h
+
 from ckan.common import _
 from flask import Blueprint, request, jsonify, redirect, send_file, make_response
-#from urllib import quote
+
 from werkzeug.datastructures import FileStorage, ContentRange
 from werkzeug.http import parse_content_range_header
 
@@ -126,7 +126,7 @@ def file_uploader_add_resources(package_id):
     package_patch = toolkit.get_action('package_patch')
     package_patch(data_dict={ 'id':package['id'], 'state': 'active'})
 
-    return toolkit.redirect_to(controller='package', action='resources', id=package['id'])
+    return toolkit.redirect_to('dataset.resources', id=package['id'])
 
 
 class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
@@ -160,13 +160,3 @@ class File_Uploader_UiPlugin(plugins.SingletonPlugin, DefaultTranslation):
 
         return blueprint
 
-    # def modify_download_request(self, url, resource, api_key, headers):
-    #     if 'file_uploader_ui' in url:
-    #         headers['Authorization'] = api_key
-    #     return url
-    #
-    # def can_upload(self, resource_id):
-    #     return True
-    #
-    # def after_upload(self, context, resource_dict, dataset_dict):
-    #     pass
