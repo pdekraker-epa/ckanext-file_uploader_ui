@@ -22,4 +22,4 @@ fileupload_styles:
         - jquery.fileupload.css
         - jquery.fileupload-ui.css
     output: file_uploader_ui/%(version)s_fileupload.css
-    filters: cssrewrite
+    #filters: cssrewrite
